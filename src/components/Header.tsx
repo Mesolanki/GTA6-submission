@@ -1,17 +1,18 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
 import type { Role } from '../types';
-import { Shield, GraduationCap, UserCheck, PlusCircle, Layers, CheckCircle2, Clock } from 'lucide-react';
+import { Shield, GraduationCap, UserCheck, PlusCircle, Layers, CheckCircle2, Clock, Trophy } from 'lucide-react';
 
 interface HeaderProps {
   onOpenRegisterModal: () => void;
+  onOpenLeaderboard: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onOpenRegisterModal }) => {
+export const Header: React.FC<HeaderProps> = ({ onOpenRegisterModal, onOpenLeaderboard }) => {
   const { currentRole, setCurrentRole, currentUser, projects } = useApp();
 
   const totalProjects = projects.length;
-  const inReviewProjects = projects.filter(p => p.status === 'In Review').length;
+  const inReviewProjects = projects.filter(p => p.status === 'Under Review' || p.status === 'In Review').length;
   const approvedProjects = projects.filter(p => p.status === 'Approved' || p.status === 'Completed').length;
 
   const roles: { key: Role; label: string; icon: React.ElementType; color: string }[] = [
@@ -38,10 +39,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpenRegisterModal }) => {
                   ApexMonitor
                 </h1>
                 <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
-                  v2.4 Live
+                  Hackathon Edition
                 </span>
               </div>
-              <p className="text-xs text-slate-400">Role-Based Project Submission & Monitoring Portal</p>
+              <p className="text-xs text-slate-400">Project Monitoring & Mentoring System</p>
             </div>
           </div>
 
@@ -85,11 +86,20 @@ export const Header: React.FC<HeaderProps> = ({ onOpenRegisterModal }) => {
               </span>
             </div>
 
+            {/* Leaderboard Button */}
+            <button
+              onClick={onOpenLeaderboard}
+              className="flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 transition-all hover:scale-105"
+            >
+              <Trophy className="w-3.5 h-3.5 text-amber-400" />
+              <span className="hidden sm:inline">Leaderboard</span>
+            </button>
+
             {/* New Project Button (Student / Admin) */}
             {currentRole !== 'mentor' && (
               <button
                 onClick={onOpenRegisterModal}
-                className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white shadow-lg shadow-cyan-500/20 transition-all duration-200 hover:scale-105"
+                className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white shadow-lg shadow-cyan-500/20 transition-all duration-200 hover:scale-105"
               >
                 <PlusCircle className="w-4 h-4" />
                 <span className="hidden sm:inline">Register Project</span>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import type { Project, Submission } from '../types';
-import { X, Award, ExternalLink, FileText, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { X, Award, ExternalLink, FileText, CheckCircle2, AlertTriangle, Sparkles } from 'lucide-react';
 
 interface EvaluationModalProps {
   project: Project;
@@ -18,26 +18,27 @@ export const EvaluationModal: React.FC<EvaluationModalProps> = ({
 }) => {
   const { evaluateSubmission } = useApp();
 
-  const [codeQuality, setCodeQuality] = useState(submission.rubricScore?.codeQuality || 22);
-  const [documentation, setDocumentation] = useState(submission.rubricScore?.documentation || 23);
-  const [innovation, setInnovation] = useState(submission.rubricScore?.innovation || 24);
-  const [presentation, setPresentation] = useState(submission.rubricScore?.presentation || 21);
+  const [innovation, setInnovation] = useState(submission.rubricScore?.innovation || 19);
+  const [implementation, setImplementation] = useState(submission.rubricScore?.implementation || 18);
+  const [progress, setProgress] = useState(submission.rubricScore?.progress || 18);
+  const [documentation, setDocumentation] = useState(submission.rubricScore?.documentation || 19);
+  const [presentation, setPresentation] = useState(submission.rubricScore?.presentation || 18);
   
-  const [status, setStatus] = useState<'Approved' | 'Needs Revision'>(
-    submission.status === 'Needs Revision' ? 'Needs Revision' : 'Approved'
+  const [status, setStatus] = useState<'Approved' | 'Revision Required'>(
+    submission.status === 'Revision Required' ? 'Revision Required' : 'Approved'
   );
   const [feedback, setFeedback] = useState(submission.mentorFeedback || '');
 
   if (!isOpen) return null;
 
-  const totalCalculatedScore = codeQuality + documentation + innovation + presentation;
+  const totalCalculatedScore = innovation + implementation + progress + documentation + presentation;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     evaluateSubmission(
       project.id,
       submission.id,
-      { codeQuality, documentation, innovation, presentation },
+      { innovation, implementation, progress, documentation, presentation },
       status,
       feedback
     );
@@ -46,7 +47,7 @@ export const EvaluationModal: React.FC<EvaluationModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-2xl bg-slate-900 border border-white/10 rounded-2xl shadow-2xl p-6 text-slate-100 my-8">
+      <div className="relative w-full max-w-2xl bg-slate-900 border border-white/10 rounded-2xl shadow-2xl p-6 text-slate-100 my-6">
         
         {/* Header */}
         <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
@@ -55,7 +56,7 @@ export const EvaluationModal: React.FC<EvaluationModalProps> = ({
               <Award className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white">Evaluate Submission</h2>
+              <h2 className="text-lg font-bold text-white">Faculty Evaluation & Rubric Scoring</h2>
               <p className="text-xs text-slate-400">{submission.milestoneTitle} — {project.teamName}</p>
             </div>
           </div>
@@ -68,10 +69,22 @@ export const EvaluationModal: React.FC<EvaluationModalProps> = ({
         </div>
 
         {/* Submission Details Summary Box */}
-        <div className="bg-slate-950/60 p-4 rounded-xl border border-white/5 space-y-2 mb-5">
+        <div className="bg-slate-950/60 p-4 rounded-xl border border-white/5 space-y-2 mb-4">
           <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
             <span className="text-slate-400">Submitted by: <strong className="text-slate-200">{submission.submittedBy}</strong></span>
             <span className="text-slate-400">Submitted at: <strong className="text-slate-200">{submission.submittedAt}</strong></span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] pt-1 text-slate-300">
+            <div className="bg-slate-900 p-2 rounded">
+              <strong className="text-emerald-400">Tasks Completed:</strong> {submission.tasksCompleted}
+            </div>
+            <div className="bg-slate-900 p-2 rounded">
+              <strong className="text-cyan-400">Current Work:</strong> {submission.currentWork}
+            </div>
+            <div className="bg-slate-900 p-2 rounded">
+              <strong className="text-purple-400">Next Plan:</strong> {submission.nextPlan}
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 pt-1">
@@ -82,17 +95,7 @@ export const EvaluationModal: React.FC<EvaluationModalProps> = ({
                 rel="noreferrer"
                 className="flex items-center space-x-1 text-xs text-cyan-400 hover:underline"
               >
-                <ExternalLink className="w-3.5 h-3.5" /> <span>View Repository Commit</span>
-              </a>
-            )}
-            {submission.liveDemoUrl && (
-              <a
-                href={submission.liveDemoUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center space-x-1 text-xs text-purple-400 hover:underline"
-              >
-                <ExternalLink className="w-3.5 h-3.5" /> <span>Live Demo Link</span>
+                <ExternalLink className="w-3.5 h-3.5" /> <span>Repository Commit</span>
               </a>
             )}
             {submission.documentName && (
@@ -101,88 +104,100 @@ export const EvaluationModal: React.FC<EvaluationModalProps> = ({
               </span>
             )}
           </div>
-
-          <p className="text-xs text-slate-300 pt-2 border-t border-white/5 italic">
-            "{submission.notes}"
-          </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4">
           
           {/* Rubric Matrix Header */}
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300">
-              Evaluation Rubric Matrix (0-25 each)
+              Judges Criteria Scoring (5 Criteria x 20 Marks = 100 Total)
             </h3>
             <div className="text-sm font-black text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 px-3 py-1 rounded-lg">
-              Total: {totalCalculatedScore} / 100
+              Total Score: {totalCalculatedScore} / 100
             </div>
           </div>
 
-          {/* Sliders Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* 5 Sliders Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
             
-            {/* Code Quality */}
-            <div className="bg-slate-950/40 p-3 rounded-lg border border-white/5 space-y-1">
+            {/* Innovation */}
+            <div className="bg-slate-950/40 p-2.5 rounded-lg border border-white/5 space-y-1">
               <div className="flex justify-between text-xs">
-                <span className="font-semibold text-slate-300">Code & Architecture</span>
-                <span className="font-bold text-cyan-400">{codeQuality} / 25</span>
+                <span className="font-semibold text-slate-300">Innovation (20)</span>
+                <span className="font-bold text-cyan-400">{innovation}</span>
               </div>
               <input
                 type="range"
                 min={0}
-                max={25}
-                value={codeQuality}
-                onChange={e => setCodeQuality(Number(e.target.value))}
+                max={20}
+                value={innovation}
+                onChange={e => setInnovation(Number(e.target.value))}
                 className="w-full accent-cyan-500 cursor-pointer"
               />
             </div>
 
-            {/* Documentation */}
-            <div className="bg-slate-950/40 p-3 rounded-lg border border-white/5 space-y-1">
+            {/* Implementation */}
+            <div className="bg-slate-950/40 p-2.5 rounded-lg border border-white/5 space-y-1">
               <div className="flex justify-between text-xs">
-                <span className="font-semibold text-slate-300">Documentation & SRS</span>
-                <span className="font-bold text-purple-400">{documentation} / 25</span>
+                <span className="font-semibold text-slate-300">Implementation (20)</span>
+                <span className="font-bold text-purple-400">{implementation}</span>
               </div>
               <input
                 type="range"
                 min={0}
-                max={25}
-                value={documentation}
-                onChange={e => setDocumentation(Number(e.target.value))}
+                max={20}
+                value={implementation}
+                onChange={e => setImplementation(Number(e.target.value))}
                 className="w-full accent-purple-500 cursor-pointer"
               />
             </div>
 
-            {/* Innovation */}
-            <div className="bg-slate-950/40 p-3 rounded-lg border border-white/5 space-y-1">
+            {/* Progress */}
+            <div className="bg-slate-950/40 p-2.5 rounded-lg border border-white/5 space-y-1">
               <div className="flex justify-between text-xs">
-                <span className="font-semibold text-slate-300">Innovation & Benchmarking</span>
-                <span className="font-bold text-emerald-400">{innovation} / 25</span>
+                <span className="font-semibold text-slate-300">Progress (20)</span>
+                <span className="font-bold text-emerald-400">{progress}</span>
               </div>
               <input
                 type="range"
                 min={0}
-                max={25}
-                value={innovation}
-                onChange={e => setInnovation(Number(e.target.value))}
+                max={20}
+                value={progress}
+                onChange={e => setProgress(Number(e.target.value))}
                 className="w-full accent-emerald-500 cursor-pointer"
               />
             </div>
 
-            {/* Defense & Presentation */}
-            <div className="bg-slate-950/40 p-3 rounded-lg border border-white/5 space-y-1">
+            {/* Documentation */}
+            <div className="bg-slate-950/40 p-2.5 rounded-lg border border-white/5 space-y-1">
               <div className="flex justify-between text-xs">
-                <span className="font-semibold text-slate-300">Defense & Q&A Response</span>
-                <span className="font-bold text-amber-400">{presentation} / 25</span>
+                <span className="font-semibold text-slate-300">Documentation (20)</span>
+                <span className="font-bold text-amber-400">{documentation}</span>
               </div>
               <input
                 type="range"
                 min={0}
-                max={25}
+                max={20}
+                value={documentation}
+                onChange={e => setDocumentation(Number(e.target.value))}
+                className="w-full accent-amber-500 cursor-pointer"
+              />
+            </div>
+
+            {/* Presentation */}
+            <div className="bg-slate-950/40 p-2.5 rounded-lg border border-white/5 space-y-1 md:col-span-2">
+              <div className="flex justify-between text-xs">
+                <span className="font-semibold text-slate-300">Presentation / Defense (20)</span>
+                <span className="font-bold text-rose-400">{presentation}</span>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={20}
                 value={presentation}
                 onChange={e => setPresentation(Number(e.target.value))}
-                className="w-full accent-amber-500 cursor-pointer"
+                className="w-full accent-rose-500 cursor-pointer"
               />
             </div>
 
@@ -195,7 +210,7 @@ export const EvaluationModal: React.FC<EvaluationModalProps> = ({
               <button
                 type="button"
                 onClick={() => setStatus('Approved')}
-                className={`flex items-center justify-center space-x-2 py-2.5 px-4 rounded-xl text-xs font-bold border transition-all ${
+                className={`flex items-center justify-center space-x-2 py-2 px-4 rounded-xl text-xs font-bold border transition-all ${
                   status === 'Approved'
                     ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300 shadow-lg shadow-emerald-500/10'
                     : 'bg-slate-950/50 border-white/10 text-slate-400 hover:bg-white/5'
@@ -207,9 +222,9 @@ export const EvaluationModal: React.FC<EvaluationModalProps> = ({
 
               <button
                 type="button"
-                onClick={() => setStatus('Needs Revision')}
-                className={`flex items-center justify-center space-x-2 py-2.5 px-4 rounded-xl text-xs font-bold border transition-all ${
-                  status === 'Needs Revision'
+                onClick={() => setStatus('Revision Required')}
+                className={`flex items-center justify-center space-x-2 py-2 px-4 rounded-xl text-xs font-bold border transition-all ${
+                  status === 'Revision Required'
                     ? 'bg-rose-500/20 border-rose-500/50 text-rose-300 shadow-lg shadow-rose-500/10'
                     : 'bg-slate-950/50 border-white/10 text-slate-400 hover:bg-white/5'
                 }`}
@@ -220,15 +235,20 @@ export const EvaluationModal: React.FC<EvaluationModalProps> = ({
             </div>
           </div>
 
-          {/* Feedback Remarks */}
+          {/* Feedback Remarks & AI Summary Preview */}
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-300">Detailed Review Remarks & Feedback *</label>
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-semibold text-slate-300">Mentor Remarks & Suggestions *</label>
+              <span className="text-[10px] text-purple-400 flex items-center gap-1">
+                <Sparkles className="w-3 h-3" /> Auto AI Summary Enabled
+              </span>
+            </div>
             <textarea
               required
-              rows={3}
+              rows={2}
               value={feedback}
               onChange={e => setFeedback(e.target.value)}
-              placeholder="Provide constructive feedback, highlight strengths, or list required changes before approval..."
+              placeholder="Provide suggestions, highlight technical strengths, or state correction guidelines..."
               className="w-full px-3 py-2 rounded-lg bg-slate-950/70 border border-white/10 text-xs text-slate-200 focus:outline-none focus:border-amber-500"
             />
           </div>
@@ -246,7 +266,7 @@ export const EvaluationModal: React.FC<EvaluationModalProps> = ({
               type="submit"
               className="px-5 py-2 rounded-lg text-xs font-semibold bg-gradient-to-r from-amber-500 to-indigo-600 hover:from-amber-400 hover:to-indigo-500 text-white shadow-lg shadow-amber-500/20"
             >
-              Submit Evaluation Grade
+              Submit Evaluation Marks
             </button>
           </div>
 
