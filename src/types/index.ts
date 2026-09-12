@@ -18,7 +18,7 @@ export interface TeamMember {
   name: string;
   email: string;
   rollNo: string;
-  roleInTeam: string; // e.g. Team Leader, Lead Developer, UI Designer
+  roleInTeam: string;
 }
 
 export interface Milestone {
@@ -27,16 +27,16 @@ export interface Milestone {
   stage: ProjectStage;
   description: string;
   dueDate: string;
-  weightage: number; // e.g. 20%
+  weightage: number;
   status: 'Upcoming' | 'Active' | 'Submitted' | 'Graded';
 }
 
 export interface EvaluationRubric {
-  innovation: number;      // max 20
-  implementation: number; // max 20
-  progress: number;       // max 20
-  documentation: number;  // max 20
-  presentation: number;   // max 20
+  innovation: number;
+  implementation: number;
+  progress: number;
+  documentation: number;
+  presentation: number;
 }
 
 export interface Submission {
@@ -54,10 +54,12 @@ export interface Submission {
   repoUrl: string;
   liveDemoUrl?: string;
   documentName?: string;
+  documentUrl?: string; // Local Object URL / data URL for PDF preview & download
+  documentSize?: string;
   notes: string;
   status: 'Pending Review' | 'Revision Required' | 'Approved';
   rubricScore?: EvaluationRubric;
-  totalScore?: number; // out of 100
+  totalScore?: number;
   mentorFeedback?: string;
   aiSummaryFeedback?: string;
   evaluatedAt?: string;
@@ -73,6 +75,7 @@ export interface ChatMessage {
   message: string;
   timestamp: string;
   attachmentName?: string;
+  attachmentUrl?: string;
 }
 
 export interface KanbanTask {
@@ -96,7 +99,7 @@ export interface Project {
   category: string;
   problemStatement: string;
   objectives: string;
-  sdgTag: string; // Sustainable Development Goal (e.g., "SDG 9: Industry, Innovation & Infrastructure")
+  sdgTag: string;
   techStack: string[];
   teamName: string;
   teamMembers: TeamMember[];
@@ -108,7 +111,7 @@ export interface Project {
   progressPercentage: number;
   githubUrl: string;
   createdAt: string;
-  similarityScore: number; // AI Duplicate check % (0-100)
+  similarityScore: number;
   milestones: Milestone[];
   submissions: Submission[];
   messages: ChatMessage[];
