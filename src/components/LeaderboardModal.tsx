@@ -12,7 +12,6 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ isOpen, onCl
 
   if (!isOpen) return null;
 
-  // Calculate highest evaluated score for each project
   const rankedProjects = projects
     .map(p => {
       const highestSub = p.submissions.reduce(
@@ -30,27 +29,27 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ isOpen, onCl
     if (rank === 1) return <span className="text-xl">🥇 Gold 1st</span>;
     if (rank === 2) return <span className="text-xl">🥈 Silver 2nd</span>;
     if (rank === 3) return <span className="text-xl">🥉 Bronze 3rd</span>;
-    return <span className="text-xs font-bold text-slate-400 font-mono">Rank #{rank}</span>;
+    return <span className="text-xs font-bold text-slate-500 font-mono">Rank #{rank}</span>;
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
-      <div className="relative w-full max-w-3xl bg-slate-900 border border-white/10 rounded-2xl shadow-2xl p-6 text-slate-100 flex flex-col max-h-[85vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+      <div className="relative w-full max-w-3xl bg-white border border-slate-200 rounded-2xl shadow-xl p-6 text-slate-900 flex flex-col max-h-[85vh]">
         
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400">
+            <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600">
               <Trophy className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white">Best-Project Leaderboard & Rankings</h2>
-              <p className="text-xs text-slate-400">Top evaluated student projects based on faculty rubric marks</p>
+              <h2 className="text-lg font-bold text-slate-900">Best-Project Leaderboard</h2>
+              <p className="text-xs text-slate-500">Top evaluated student projects based on faculty rubric marks</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -63,23 +62,23 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ isOpen, onCl
               key={project.id}
               className={`p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all ${
                 idx === 0
-                  ? 'bg-gradient-to-r from-amber-500/10 via-slate-900 to-slate-900 border-amber-500/40 shadow-lg shadow-amber-500/10'
+                  ? 'bg-amber-50/80 border-amber-200 shadow-xs'
                   : idx === 1
-                  ? 'bg-slate-900 border-slate-400/30'
+                  ? 'bg-slate-50 border-slate-200'
                   : idx === 2
-                  ? 'bg-slate-900 border-amber-700/30'
-                  : 'bg-slate-950/40 border-white/5'
+                  ? 'bg-orange-50/60 border-orange-200'
+                  : 'bg-white border-slate-200'
               }`}
             >
               <div className="space-y-1">
                 <div className="flex items-center space-x-3">
                   <div className="font-bold">{getRankBadge(idx + 1)}</div>
                   <div>
-                    <h3 className="text-sm font-bold text-white">{project.title}</h3>
-                    <div className="flex items-center space-x-2 text-[11px] text-slate-400">
-                      <span>Team: <strong className="text-slate-200">{project.teamName}</strong></span>
+                    <h3 className="text-sm font-bold text-slate-900">{project.title}</h3>
+                    <div className="flex items-center space-x-2 text-[11px] text-slate-500">
+                      <span>Team: <strong className="text-slate-800">{project.teamName}</strong></span>
                       <span>•</span>
-                      <span className="text-cyan-400 font-medium">{project.sdgTag}</span>
+                      <span className="text-indigo-600 font-medium">{project.sdgTag}</span>
                     </div>
                   </div>
                 </div>
@@ -87,14 +86,14 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ isOpen, onCl
 
               <div className="flex items-center space-x-4 self-end sm:self-center">
                 <div className="text-right">
-                  <div className="text-[10px] text-slate-400 uppercase font-semibold">Evaluation Score</div>
-                  <div className="text-xl font-black text-amber-400">{bestScore} / 100</div>
+                  <div className="text-[10px] text-slate-500 uppercase font-bold">Marks</div>
+                  <div className="text-xl font-extrabold text-amber-700">{bestScore} / 100</div>
                 </div>
                 <a
                   href={project.githubUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-slate-300 transition-colors"
+                  className="p-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 transition-colors"
                   title="View Repository"
                 >
                   <ExternalLink className="w-4 h-4" />
