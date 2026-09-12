@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import type { Project, Submission } from '../types';
-import { X, Award, ExternalLink, FileText, CheckCircle2, AlertTriangle, Sparkles } from 'lucide-react';
+import { X, Award, ExternalLink, CheckCircle2, AlertTriangle, Sparkles, FileCheck } from 'lucide-react';
 
 interface EvaluationModalProps {
   project: Project;
@@ -68,26 +68,46 @@ export const EvaluationModal: React.FC<EvaluationModalProps> = ({
           </button>
         </div>
 
-        {/* Submission Details Summary Box */}
-        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2 mb-4">
+        {/* Submission Details & PDF Viewer Box */}
+        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3 mb-4">
           <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
             <span className="text-slate-600">Submitted by: <strong className="text-slate-900">{submission.submittedBy}</strong></span>
             <span className="text-slate-600">Submitted at: <strong className="text-slate-900">{submission.submittedAt}</strong></span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] pt-1 text-slate-700">
-            <div className="bg-white p-2 rounded border border-slate-200">
-              <strong className="text-emerald-700">Tasks Completed:</strong> {submission.tasksCompleted}
+          {/* PDF Local Document Viewer Action Bar */}
+          <div className="bg-white p-3 rounded-lg border border-indigo-200 flex items-center justify-between shadow-xs">
+            <div className="flex items-center space-x-2">
+              <FileCheck className="w-5 h-5 text-rose-600" />
+              <div>
+                <div className="font-bold text-slate-900 text-xs">{submission.documentName || 'Student_Deliverable_Report.pdf'}</div>
+                <div className="text-[10px] text-slate-500">{submission.documentSize || '1.8 MB'} • PDF Document</div>
+              </div>
             </div>
-            <div className="bg-white p-2 rounded border border-slate-200">
-              <strong className="text-indigo-700">Current Work:</strong> {submission.currentWork}
-            </div>
-            <div className="bg-white p-2 rounded border border-slate-200">
-              <strong className="text-purple-700">Next Plan:</strong> {submission.nextPlan}
-            </div>
+
+            {submission.documentUrl ? (
+              <a
+                href={submission.documentUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold flex items-center space-x-1 shadow-xs transition-colors"
+              >
+                <span>Open & View PDF</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            ) : (
+              <button
+                type="button"
+                onClick={() => alert(`Opening sample student PDF report: ${submission.documentName}`)}
+                className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold flex items-center space-x-1 shadow-xs"
+              >
+                <span>View PDF Document</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 pt-1">
+          <div className="flex flex-wrap items-center gap-3 text-xs">
             {submission.repoUrl && (
               <a
                 href={submission.repoUrl}
@@ -95,13 +115,18 @@ export const EvaluationModal: React.FC<EvaluationModalProps> = ({
                 rel="noreferrer"
                 className="flex items-center space-x-1 text-xs text-indigo-600 hover:underline font-semibold"
               >
-                <ExternalLink className="w-3.5 h-3.5" /> <span>Repository Commit</span>
+                <ExternalLink className="w-3.5 h-3.5" /> <span>View Repository Commit Code</span>
               </a>
             )}
-            {submission.documentName && (
-              <span className="flex items-center space-x-1 text-xs text-amber-700 font-semibold">
-                <FileText className="w-3.5 h-3.5" /> <span>{submission.documentName}</span>
-              </span>
+            {submission.liveDemoUrl && (
+              <a
+                href={submission.liveDemoUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center space-x-1 text-xs text-purple-600 hover:underline font-semibold"
+              >
+                <ExternalLink className="w-3.5 h-3.5" /> <span>View Live Demo</span>
+              </a>
             )}
           </div>
         </div>

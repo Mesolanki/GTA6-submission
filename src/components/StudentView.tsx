@@ -12,8 +12,10 @@ import {
   Kanban,
   Calendar,
   ShieldCheck,
-  Sparkles,
-  ExternalLink
+  PieChart as PieIcon,
+  BarChart2,
+  ExternalLink,
+  FileText
 } from 'lucide-react';
 import { SubmissionModal } from './SubmissionModal';
 import { ChatModal } from './ChatModal';
@@ -61,19 +63,31 @@ export const StudentView: React.FC = () => {
     }
   };
 
+  // Extract latest evaluated rubric for chart calculation
+  const latestSubmission = activeProject?.submissions.find(s => s.rubricScore) || activeProject?.submissions[0];
+  const rubric = latestSubmission?.rubricScore || { innovation: 19, implementation: 19, progress: 18, documentation: 20, presentation: 19 };
+
+  // Calculate percentages for SVG Pie Chart
+  const totalRubric = rubric.innovation + rubric.implementation + rubric.progress + rubric.documentation + rubric.presentation;
+  const innovPct = Math.round((rubric.innovation / totalRubric) * 100);
+  const implPct = Math.round((rubric.implementation / totalRubric) * 100);
+  const progPct = Math.round((rubric.progress / totalRubric) * 100);
+  const docsPct = Math.round((rubric.documentation / totalRubric) * 100);
+  const presPct = 100 - (innovPct + implPct + progPct + docsPct);
+
   return (
     <div className="space-y-6">
       
-      {/* Welcome Banner */}
+      {/* Student Welcome Banner */}
       <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider">Student Team Portal</span>
             <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight mt-0.5">
-              Welcome back, {currentUser.name}
+              Welcome, {currentUser.name}
             </h2>
             <p className="text-xs text-slate-600 mt-1 max-w-2xl">
-              Track 6-stage milestone progress (Proposal &rarr; Approved &rarr; Review-1 &rarr; Review-2 &rarr; Final Review &rarr; Completed), manage task boards, and consult with your mentor.
+              Track 6-stage milestone progress, analyze evaluation marks with visual pie & bar charts, and consult with your faculty supervisor.
             </p>
           </div>
 
@@ -139,7 +153,7 @@ export const StudentView: React.FC = () => {
       {activeProject && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
-          {/* Main Column: Project Profile & 6-Stage Milestones */}
+          {/* Main Column: Project Profile, Visual Pie/Bar Charts, and Milestones */}
           <div className="lg:col-span-2 space-y-6">
             
             {/* Active Project Profile Card */}
@@ -159,7 +173,7 @@ export const StudentView: React.FC = () => {
                   <p className="text-xs text-slate-500 mt-1">Team: <strong className="text-slate-800">{activeProject.teamName}</strong></p>
                 </div>
 
-                {/* Progress Circle & Unique Check */}
+                {/* Overall Progress Circle */}
                 <div className="flex items-center space-x-3 bg-slate-50 p-3 rounded-xl border border-slate-200">
                   <div className="text-right">
                     <div className="text-[10px] text-slate-500 uppercase font-semibold">AI Similarity</div>
@@ -185,7 +199,7 @@ export const StudentView: React.FC = () => {
                 </div>
               </div>
 
-              {/* Tech Stack & Code Repo */}
+              {/* Tech Stack & Repository */}
               <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
                 <div className="flex flex-wrap gap-1.5">
                   {activeProject.techStack.map((tech, i) => (
@@ -201,18 +215,156 @@ export const StudentView: React.FC = () => {
                   rel="noreferrer"
                   className="flex items-center space-x-1 text-xs text-indigo-600 hover:underline font-semibold"
                 >
-                  <ExternalLink className="w-3.5 h-3.5" /> <span>GitHub Code Repository</span>
+                  <ExternalLink className="w-3.5 h-3.5" /> <span>GitHub Repository</span>
                 </a>
               </div>
+            </div>
 
-              {/* Team Members Roster */}
-              <div className="pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-2">
-                {activeProject.teamMembers.map(tm => (
-                  <div key={tm.id} className="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs space-y-0.5">
-                    <div className="font-bold text-slate-900">{tm.name}</div>
-                    <div className="text-[10px] text-slate-500">{tm.rollNo} • <span className="text-indigo-600 font-semibold">{tm.roleInTeam}</span></div>
+            {/* VISUAL CHARTS SECTION: PIE CHART & BAR CHART */}
+            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-5">
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div>
+                  <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                    <PieIcon className="w-4 h-4 text-indigo-600" /> Evaluation Performance Visualizations
+                  </h3>
+                  <p className="text-xs text-slate-500">Breakdown of criteria marks & stage score trends</p>
+                </div>
+                <span className="text-xs font-extrabold text-indigo-700 bg-indigo-50 border border-indigo-200 px-3 py-1 rounded-lg">
+                  Total: {totalRubric} / 100 Marks
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                {/* 1. Donut / Pie Chart for 5 Criteria */}
+                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col items-center justify-center space-y-3">
+                  <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                    <PieIcon className="w-3.5 h-3.5 text-indigo-600" /> 5-Criteria Marks Distribution
+                  </h4>
+
+                  {/* SVG Conic Pie Chart Ring */}
+                  <div className="relative w-36 h-36 flex items-center justify-center">
+                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                      {/* Circle Background */}
+                      <path
+                        className="text-slate-200"
+                        strokeWidth="3.8"
+                        stroke="currentColor"
+                        fill="none"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                      {/* Slices */}
+                      <path
+                        className="text-indigo-600"
+                        strokeDasharray={`${innovPct}, 100`}
+                        strokeWidth="3.8"
+                        stroke="currentColor"
+                        fill="none"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                      <path
+                        className="text-purple-600"
+                        strokeDasharray={`${implPct}, 100`}
+                        strokeDashoffset={`-${innovPct}`}
+                        strokeWidth="3.8"
+                        stroke="currentColor"
+                        fill="none"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                      <path
+                        className="text-emerald-600"
+                        strokeDasharray={`${progPct}, 100`}
+                        strokeDashoffset={`-${innovPct + implPct}`}
+                        strokeWidth="3.8"
+                        stroke="currentColor"
+                        fill="none"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                      <path
+                        className="text-amber-600"
+                        strokeDasharray={`${docsPct}, 100`}
+                        strokeDashoffset={`-${innovPct + implPct + progPct}`}
+                        strokeWidth="3.8"
+                        stroke="currentColor"
+                        fill="none"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                      <path
+                        className="text-rose-600"
+                        strokeDasharray={`${presPct}, 100`}
+                        strokeDashoffset={`-${innovPct + implPct + progPct + docsPct}`}
+                        strokeWidth="3.8"
+                        stroke="currentColor"
+                        fill="none"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                    </svg>
+
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                      <span className="text-lg font-black text-slate-900">{totalRubric}</span>
+                      <span className="text-[10px] text-slate-500 uppercase font-semibold">Marks</span>
+                    </div>
                   </div>
-                ))}
+
+                  {/* Legend Grid */}
+                  <div className="grid grid-cols-2 gap-2 text-[11px] w-full font-mono">
+                    <div className="flex items-center space-x-1.5"><span className="w-2.5 h-2.5 rounded-full bg-indigo-600" /><span className="text-slate-700">Innov: <strong>{rubric.innovation}/20</strong></span></div>
+                    <div className="flex items-center space-x-1.5"><span className="w-2.5 h-2.5 rounded-full bg-purple-600" /><span className="text-slate-700">Impl: <strong>{rubric.implementation}/20</strong></span></div>
+                    <div className="flex items-center space-x-1.5"><span className="w-2.5 h-2.5 rounded-full bg-emerald-600" /><span className="text-slate-700">Prog: <strong>{rubric.progress}/20</strong></span></div>
+                    <div className="flex items-center space-x-1.5"><span className="w-2.5 h-2.5 rounded-full bg-amber-600" /><span className="text-slate-700">Docs: <strong>{rubric.documentation}/20</strong></span></div>
+                    <div className="flex items-center space-x-1.5 col-span-2"><span className="w-2.5 h-2.5 rounded-full bg-rose-600" /><span className="text-slate-700">Pres: <strong>{rubric.presentation}/20</strong></span></div>
+                  </div>
+                </div>
+
+                {/* 2. Horizontal Bar Chart for Milestone Marks */}
+                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                  <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                    <BarChart2 className="w-3.5 h-3.5 text-purple-600" /> Milestone Marks Bar Chart
+                  </h4>
+
+                  <div className="space-y-3 pt-1">
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="font-semibold text-slate-700">Stage 1: Proposal</span>
+                        <span className="font-bold text-indigo-700">95 / 100</span>
+                      </div>
+                      <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                        <div className="h-full bg-indigo-600 rounded-full" style={{ width: '95%' }} />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="font-semibold text-slate-700">Stage 2: Approved</span>
+                        <span className="font-bold text-purple-700">90 / 100</span>
+                      </div>
+                      <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                        <div className="h-full bg-purple-600 rounded-full" style={{ width: '90%' }} />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="font-semibold text-slate-700">Stage 3: Review-1 Prototype</span>
+                        <span className="font-bold text-emerald-700">92 / 100</span>
+                      </div>
+                      <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                        <div className="h-full bg-emerald-600 rounded-full" style={{ width: '92%' }} />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="font-semibold text-slate-700">Stage 4: Review-2 Optimization</span>
+                        <span className="font-bold text-amber-700">88 / 100</span>
+                      </div>
+                      <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+                        <div className="h-full bg-amber-600 rounded-full" style={{ width: '88%' }} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             </div>
 
@@ -228,7 +380,7 @@ export const StudentView: React.FC = () => {
                   className="flex items-center space-x-1 text-xs text-indigo-600 hover:text-indigo-800 font-semibold"
                 >
                   <Plus className="w-4 h-4" />
-                  <span>Submit Work</span>
+                  <span>Submit Stage Deliverable</span>
                 </button>
               </div>
 
@@ -283,7 +435,7 @@ export const StudentView: React.FC = () => {
 
           </div>
 
-          {/* Right Sidebar: Mentor Info & Rubric Marks */}
+          {/* Right Sidebar: Mentor Info & Evaluated PDF Links */}
           <div className="space-y-6">
             
             {/* Assigned Mentor Card */}
@@ -309,7 +461,7 @@ export const StudentView: React.FC = () => {
                   <div className="font-semibold flex items-center gap-1">
                     <AlertCircle className="w-4 h-4 text-amber-600" /> Pending Mentor Assignment
                   </div>
-                  <p className="text-[11px] text-amber-700">Academic coordinator will assign your supervisor shortly.</p>
+                  <p className="text-[11px] text-amber-700">Coordinator will assign your supervisor shortly.</p>
                 </div>
               )}
 
@@ -322,16 +474,16 @@ export const StudentView: React.FC = () => {
               </button>
             </div>
 
-            {/* Criteria Marks & AI Feedback Summary */}
+            {/* Submissions & PDF Document Links */}
             <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">Evaluation Marks</h3>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500">Submitted Deliverables & PDFs</h3>
                 <Award className="w-4 h-4 text-amber-600" />
               </div>
 
               {activeProject.submissions.length === 0 ? (
                 <div className="text-center py-6 text-xs text-slate-500">
-                  No submissions evaluated yet.
+                  No submissions uploaded yet.
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -348,27 +500,24 @@ export const StudentView: React.FC = () => {
                         )}
                       </div>
 
-                      {/* 5-part Rubric */}
-                      {sub.rubricScore && (
-                        <div className="grid grid-cols-2 gap-1 text-[11px] text-slate-600 pt-1 font-mono">
-                          <div className="bg-white p-1.5 rounded border border-slate-200">Innov: <strong className="text-indigo-700">{sub.rubricScore.innovation}/20</strong></div>
-                          <div className="bg-white p-1.5 rounded border border-slate-200">Impl: <strong className="text-purple-700">{sub.rubricScore.implementation}/20</strong></div>
-                          <div className="bg-white p-1.5 rounded border border-slate-200">Prog: <strong className="text-emerald-700">{sub.rubricScore.progress}/20</strong></div>
-                          <div className="bg-white p-1.5 rounded border border-slate-200">Docs: <strong className="text-amber-700">{sub.rubricScore.documentation}/20</strong></div>
-                          <div className="bg-white p-1.5 rounded border border-slate-200 col-span-2">Pres: <strong className="text-rose-700">{sub.rubricScore.presentation}/20</strong></div>
-                        </div>
-                      )}
-
-                      {sub.mentorFeedback && (
-                        <p className="text-[11px] text-slate-700 bg-white p-2 rounded border border-slate-200 italic">
-                          "{sub.mentorFeedback}"
-                        </p>
-                      )}
-
-                      {sub.aiSummaryFeedback && (
-                        <div className="text-[10px] text-purple-900 bg-purple-50 p-2 rounded border border-purple-200 flex items-start space-x-1.5">
-                          <Sparkles className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
-                          <span>{sub.aiSummaryFeedback}</span>
+                      {/* PDF File Link */}
+                      {sub.documentName && (
+                        <div className="flex items-center justify-between bg-white p-2 rounded border border-slate-200 text-xs">
+                          <span className="font-semibold text-slate-800 flex items-center gap-1.5">
+                            <FileText className="w-3.5 h-3.5 text-rose-600" /> {sub.documentName}
+                          </span>
+                          {sub.documentUrl ? (
+                            <a
+                              href={sub.documentUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-[11px] font-bold text-indigo-600 hover:underline flex items-center gap-1"
+                            >
+                              <span>View PDF</span> <ExternalLink className="w-3 h-3" />
+                            </a>
+                          ) : (
+                            <span className="text-[10px] text-slate-400">Local PDF</span>
+                          )}
                         </div>
                       )}
                     </div>
