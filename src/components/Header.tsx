@@ -1,13 +1,13 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
-import { Layers, Trophy, PlusCircle } from 'lucide-react';
+import { Layers, Trophy } from 'lucide-react';
 
 interface HeaderProps {
   onOpenRegisterModal: () => void;
   onOpenLeaderboard: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onOpenRegisterModal, onOpenLeaderboard }) => {
+export const Header: React.FC<HeaderProps> = ({ onOpenLeaderboard }) => {
   const { currentUser, currentRole } = useApp();
 
   return (
@@ -15,7 +15,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenRegisterModal, onOpenLeade
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
         <div className="flex items-center justify-between gap-4">
           
-          {/* Brand Logo & Clean Title (No role navbar or switching links) */}
+          {/* Brand Logo & Clean Title */}
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white">
               <Layers className="w-5 h-5" />
@@ -36,7 +36,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenRegisterModal, onOpenLeade
             </div>
           </div>
 
-          {/* Action Buttons & User Profile (No role switcher) */}
+          {/* Action Buttons & User Profile (Register Project button removed) */}
           <div className="flex items-center space-x-3">
             {/* Leaderboard Button */}
             <button
@@ -46,17 +46,6 @@ export const Header: React.FC<HeaderProps> = ({ onOpenRegisterModal, onOpenLeade
               <Trophy className="w-3.5 h-3.5 text-amber-600" />
               <span className="hidden sm:inline">Leaderboard</span>
             </button>
-
-            {/* Register Project Button */}
-            {currentRole === 'student' && (
-              <button
-                onClick={onOpenRegisterModal}
-                className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white transition-colors"
-              >
-                <PlusCircle className="w-4 h-4" />
-                <span className="hidden sm:inline">Register Project</span>
-              </button>
-            )}
 
             {/* User Avatar */}
             <div className="flex items-center space-x-2 border-l border-slate-200 pl-3">

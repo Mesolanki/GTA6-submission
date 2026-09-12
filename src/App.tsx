@@ -34,7 +34,7 @@ const MainContent: React.FC = () => {
     <div className="min-h-screen bg-white text-slate-900 flex flex-col">
       <RoleSyncEffect />
       
-      {/* Header with Clean Role URLs */}
+      {/* Header */}
       <Header
         onOpenRegisterModal={() => setRegisterModalOpen(true)}
         onOpenLeaderboard={() => setLeaderboardOpen(true)}
@@ -51,17 +51,11 @@ const MainContent: React.FC = () => {
         </Routes>
       </main>
 
-      {/* Footer */}
+      {/* Clean Footer */}
       <footer className="border-t border-slate-200 py-6 text-center text-xs text-slate-500 bg-white">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div>ApexMonitor Project Monitoring System &copy; 2026. All rights reserved.</div>
-          <div className="flex items-center space-x-4 text-slate-600 font-medium">
-            <span>URL: /student</span>
-            <span>•</span>
-            <span>URL: /mentor</span>
-            <span>•</span>
-            <span>URL: /admin</span>
-          </div>
+          <div className="text-slate-400">Student • Faculty Mentor • Coordinator Admin</div>
         </div>
       </footer>
 

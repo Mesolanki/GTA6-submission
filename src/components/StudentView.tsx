@@ -9,8 +9,6 @@ import {
   Award,
   Layers,
   ChevronRight,
-  Kanban,
-  Calendar,
   ShieldCheck,
   PieChart as PieIcon,
   BarChart2,
@@ -90,42 +88,6 @@ export const StudentView: React.FC = () => {
               Track 6-stage milestone progress, analyze evaluation marks with visual pie & bar charts, and consult with your faculty supervisor.
             </p>
           </div>
-
-          {activeProject && (
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                onClick={() => setKanbanOpen(true)}
-                className="flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 transition-colors"
-              >
-                <Kanban className="w-3.5 h-3.5 text-indigo-600" />
-                <span>Task Board ({activeProject.kanbanTasks.length})</span>
-              </button>
-
-              <button
-                onClick={() => setMeetingLogsOpen(true)}
-                className="flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 transition-colors"
-              >
-                <Calendar className="w-3.5 h-3.5 text-purple-600" />
-                <span>Meeting Logs ({activeProject.meetingLogs.length})</span>
-              </button>
-
-              <button
-                onClick={() => setChatModalOpen(true)}
-                className="flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 transition-colors"
-              >
-                <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Mentor Chat ({activeProject.messages.length})</span>
-              </button>
-
-              <button
-                onClick={() => handleOpenSubmission()}
-                className="flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Submit Work</span>
-              </button>
-            </div>
-          )}
         </div>
       </div>
 
